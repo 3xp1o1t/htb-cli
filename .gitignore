@@ -1,3 +1,8 @@
+# Custom files
+config.cfg
+.vscode/
+machines.txt
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

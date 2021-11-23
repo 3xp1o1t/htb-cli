@@ -1,0 +1,29 @@
+[default]
+machine_list = machines.txt
+beat_time = 0.01
+
+[htb]
+api_url = https://www.hackthebox.com/api/v4
+machine_url = https://www.hackthebox.com/api/v4/machine
+vm_url = https://www.hackthebox.com/api/v4/vm
+
+[htb_auth]
+login = /login
+otp = /2fa/login
+
+[htb_machine_api]
+all = /list/all
+active = /list
+retired = /list/retired
+spawned = /active
+spawn = /spawn
+terminate = /terminate
+
+[htb_headers]
+authority = www.hackthebox.com
+accept = application/json, text/plain, */*
+user-agent = HackTheBox Commnand Line Interface v1.0
+pragma = no-cache
+origin = https://app.hackthebox.eu
+authorization = 
+referer = https://app.hackthebox.com/

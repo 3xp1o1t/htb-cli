@@ -123,10 +123,11 @@ Install each tool following next instructions.
    ```sh
    git clone https://github.com/3xp1o1t/htb-cli.git
    ```
-2. On linux give execute permissions 
+2. On linux give execute permissions (Linux users)
    ```sh
    chmod +x main.py
    ```
+3. Rename config.cfg.example to config.cfg
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 

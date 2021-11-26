@@ -1,6 +1,5 @@
 from rich.live import Live
 from rich.style import Style
-from rich.console import Console
 from contextlib import contextmanager
 from time import sleep
 
@@ -13,12 +12,10 @@ def beat(length: int = 1) -> None:
     yield
     sleep(length * 0.02)
 
-def intro():
+def intro(console):
     """
     intro: Just prints an animated htb logo with some color
     """
-    console = Console()
-    console.clear()
     logo_style = Style(color="bright_red", blink=True, bold=True)
     
     with Live(console=console, screen=False, refresh_per_second=60):

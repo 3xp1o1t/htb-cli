@@ -1,5 +1,3 @@
-from rich.console import Console
-from rich.live import Live
 from re import fullmatch 
 from tools.api import api_post
 from tools.utils import update_config
@@ -11,14 +9,13 @@ def check(email):
     return fullmatch(regex, email)
     
 
-def login(config: ConfigParser):
+def login(config: ConfigParser, console):
     """
     login: Simple method to log-in into HTB Platform to get Bearer Token for API
     :param url: Url htb platform
     :param endpoint: Url login endpoint
     :return: True if successful, False otherwise or Bearer token if was enable
     """
-    console = Console()
 
     url = config['htb']['api_url']
     endpoint = config['htb_auth']['login']
@@ -27,11 +24,11 @@ def login(config: ConfigParser):
     valid_email = None 
 
     while valid_email == None:
-        email = console.input("[bold green]Please, enter your email: ")
+        email = console.input("[bright_green]Please, enter your email: ")
         valid_email = check(email)
 
         if not valid_email: 
-            console.print("[bold red]Invalid email, try again!")
+            console.print("Invalid email, try again!", style = "error")
 
     password = console.input("[bold green]Please, enter your password: ", password = True) 
 
@@ -51,7 +48,7 @@ def login(config: ConfigParser):
     if response.status_code != 200:
         return False
 
-    console.print("[bold bright_green]Login successfully!")
+    console.print("Login successfully!", style = "info")
     # Cast to json to access values
     response = response.json()
     access_token = response['message']['access_token']
@@ -60,27 +57,26 @@ def login(config: ConfigParser):
         return True
 
     # 2FA enabled
-    if not verify_otp(config, access_token):
+    if not verify_otp(config, access_token, console):
         return False
 
-    console.print("[bold bright_green]Access token verified!")
+    console.print("Access token verified!", style = "info")
 
     # Update Bearer token from config file
     access_token = "Bearer " + access_token
     update_bearer = update_config('config.cfg', 'htb_headers', 'authorization', access_token)    
     if not update_bearer:
-        console.print("[bold bright_yellow]Everything is fine, we just couldn't update your access token in config file!")
+        console.print("Everything is fine, we just couldn't update your access token in config file!", style = "warning")
     
     return True
     
-def verify_otp(config: ConfigParser, access_token: str) -> bool:
+def verify_otp(config: ConfigParser, access_token: str, console) -> bool:
     """
     verify_otp: Verify 2fa code in case was enabled
     :param config: Confi parser to get url, endpoint and headers.
     :param access_token: Bearer token from login successful
     :return: True if successful, False otherwise
     """
-    console = Console()
     url = config['htb']['api_url']
     endpoint = config['htb_auth']['otp']
     headers = dict(config['htb_headers'])

@@ -1,35 +1,18 @@
 from configparser import ConfigParser
-from os import path
-from sys import exit
 from json import dump, load
 
 """
 Collection of methods that works as helpers.
 """
-# Bad programming practice, idk how to fix this.
-SECTIONS = ['default', 'htb', 'htb_auth', 'htb_machine_api', 'htb_headers']
 
 def read_config(filename: str) -> ConfigParser:
     """
     read_config: find and load the config.cfg file contents
     :param filename: file name to open
     :return: ConfigParser object
-    TODO: 
-        - Do something with global var
     """
     config = ConfigParser()
-
-    if not path.exists(filename):
-        exit(f"Error - {filename} not found!")
-
     config.read(filename)
-
-    if len(config.sections()) != len(SECTIONS):
-        exit("Error - Invalid config file!")
-
-    for section in SECTIONS:
-        if not config.has_section(section):
-            exit(f"Error - Invalid {section} in config file!")
 
     return config
 

@@ -2,6 +2,10 @@ from rich.table import Table
 from rich.style import Style
 from rich import box
 
+"""
+Simple method to print out static menus
+"""
+
 def print_menu(console, options, column_title):
     """
     print_menu: Metodo global para imprimir un menu en base a una lista

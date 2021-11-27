@@ -3,6 +3,10 @@ from rich.style import Style
 from contextlib import contextmanager
 from time import sleep
 
+"""
+Simple method to print an animated introduction to the HTB-CLI tool
+"""
+
 @contextmanager
 def beat(length: int = 1) -> None:
     """

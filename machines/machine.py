@@ -1,8 +1,12 @@
 from rich import style
 from tools.utils import save_machine_list, load_machine_list
 from tools.api import api_get, api_post
-from tools.print_table import print_machine_table
+from machines.print_machine_table import print_table
 from rich.style import Style
+
+"""
+Related methods for playing the machines 
+"""
 
 def list_ranking(config, console):
     """
@@ -11,9 +15,11 @@ def list_ranking(config, console):
     url = config['htb']['machine_url']
     endpoint = config['htb_machine_api']['active']
     headers = dict(config['htb_headers'])
-    machine_list = api_get(url, endpoint, headers)
 
-    print_machine_table(console, machine_list, "HTB Ranking Machines")
+    with console.status("[bold bright_cyan]Requesting active machines", spinner = "aesthetic") as status:
+        machine_list = api_get(url, endpoint, headers)
+
+    print_table(console, machine_list, "HTB Ranking Machines")
         
 def list_vip(config, console):
     """
@@ -22,9 +28,11 @@ def list_vip(config, console):
     url = config['htb']['machine_url']
     endpoint = config['htb_machine_api']['retired']
     headers = dict(config['htb_headers'])
-    machine_list = api_get(url, endpoint, headers)
 
-    print_machine_table(console, machine_list, "HTB VIP Machines")
+    with console.status("[bold bright_cyan]Requesting active machines", spinner = "aesthetic") as status:
+        machine_list = api_get(url, endpoint, headers)
+
+    print_table(console, machine_list, "HTB VIP Machines")
 
 def list_all(config, console):
     """
@@ -50,12 +58,12 @@ def list_all(config, console):
 
     console.print(f"Total machines: {len(all_machine_list['info'])}", style = 'info')
 
-    user_choice = console.input("[bold bright_green]Machine DB successfully updated!, Do you want to print out? y/n: ")
+    user_choice = console.input("[bold bright_green]Machine DB successfully updated!, Do you want to print the output? y/n: ")
     if user_choice.lower() != 'y':
         console.clear()
         return
     
-    print_machine_table(console, all_machine_list, "HTB All Machines")
+    print_table(console, all_machine_list, "HTB All Machines")
 
 def search_by_filter(config, console, filter):
     """
@@ -66,7 +74,7 @@ def search_by_filter(config, console, filter):
 
     user_choice = console.input(f"[bold bright_cyan]Please insert the {filter}: ")
 
-    # Search result = Dict like machine_list to reuse print_machine_table
+    # Search result = Dict like machine_list to reuse print_table
     search_result = {"info": []}
 
     for index in range(len(machine_list['info'])):
@@ -79,7 +87,7 @@ def search_by_filter(config, console, filter):
         console.print(f"Sorry, nothing was found with * {user_choice} * value!", style = 'error')
         return
 
-    print_machine_table(console, search_result, "Search results")
+    print_table(console, search_result, "Search results")
 
 
 def search_by_maker(config, console):
@@ -92,7 +100,7 @@ def search_by_maker(config, console):
 
     user_choice = console.input(f"[bold bright_cyan]Please insert the creator username: ")
 
-    # Search result = Dict like machine_list to reuse print_machine_table
+    # Search result = Dict like machine_list to reuse print_table
     search_result = {"info": []}
 
     for index in range(len(machine_list['info'])):
@@ -113,4 +121,4 @@ def search_by_maker(config, console):
         console.print(f"Sorry, nothing was found with * {user_choice} * value!", style = 'error')
         return
 
-    print_machine_table(console, search_result, f"Machines made by [bold bright_green]{user_choice}")
+    print_table(console, search_result, f"Machines made by [bold bright_green]{user_choice}")

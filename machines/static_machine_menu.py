@@ -1,8 +1,8 @@
 from tools.generate_menu import print_menu
-from machine import *
+from machines.machine import *
 
 """
-TODO Tal vez esto se pueda simplificar usando una clase posteriormente generar metodos estaticos con el metodo getattr obtener la primera linea de su descripcion de DOC para generar el nombre y filtrarlos, posteriormente llamar el metodo, por el momento esta en el prototipo implementado, pero aqui hay que migrarlo.
+Related methods for printing and performing operations with the machines.
 """
 
 def default_menu(config, console):
@@ -55,7 +55,7 @@ def machine_menu(config, console):
             list_all(config, console)
 
         elif user_input == '4':
-            machine_search_menu(config, console)
+            search_machine_menu(config, console)
         elif user_input == '5':
             console.print('Option choice = 5')
 
@@ -78,7 +78,7 @@ def machine_menu(config, console):
             console.print("Invalid option, try again!", style="error")
 
 
-def machine_search_menu(config, console):
+def search_machine_menu(config, console):
     default_options = [
         '1. Filter machines by Name',
         '2. Filter machines by OS',

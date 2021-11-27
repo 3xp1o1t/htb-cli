@@ -3,6 +3,10 @@ from tools.api import api_post
 from tools.utils import update_config
 from configparser import ConfigParser
 
+"""
+Related methods for verifying and authenticating with the HTB V4 API
+"""
+
 def check(email):
     # Regex from geeksforgeeks.org
     regex = r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b'

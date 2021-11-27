@@ -1,6 +1,6 @@
 from requests import post, get
 """
-This file contains all http methods to interact with the HTB API
+Related methods for submitting requests to the HTB V4 API
 """
 
 def api_get(url: str, endpoint: str, headers: dict) -> list:

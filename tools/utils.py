@@ -2,7 +2,7 @@ from configparser import ConfigParser
 from json import dump, load
 
 """
-Collection of methods that works as helpers.
+Collection of methods that function as helpers
 """
 
 def read_config(filename: str) -> ConfigParser:

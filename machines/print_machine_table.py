@@ -6,7 +6,7 @@ from rich.align import Align
 from rich import box
 
 """
-Default file to print all functions related with tables and data 
+Related methods for printing tables with machine information.
 """
 
 # Controling animation duration
@@ -20,7 +20,7 @@ def beat(length: int = 1) -> None:
     yield
     sleep(length * BEAT_TIME)
 
-def print_machine_table(console, machine_list, table_title):
+def print_table(console, machine_list, table_title):
     """
     print_machine: Draw a table with a simple animation for all machine list
     :param console: Console() from rich to print table

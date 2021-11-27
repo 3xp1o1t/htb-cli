@@ -148,7 +148,7 @@ Run it, log-in, have some fun on HTB and repeat!.
 - [x] Exploring, spawning and filtering Machines
 - [ ] Exploring and filtering challenges
 - [ ] Organize project structure
-    - [ ] Apply some patter or something like
+    - [ ] Apply some pattern or something like
     - [ ] Add more features like teams/fortress, etc.
 
 See the [open issues](https://github.com/3xp1o1t/htb-cli/issues) for a full list of proposed features (and known issues).
@@ -191,6 +191,8 @@ Distributed under the MIT License. See `LICENSE.txt` for more information.
 3xp1o1t at Keybase - [@keybase](https://keybase.io/3xp1o1t) 
 
 Project Link: [https://github.com/3xp1o1t/htb-cli](https://github.com/3xp1o1t/htb-cli)
+
+About author: Sorry for my poor english and my bad programming practices, i'm still learning :)
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 

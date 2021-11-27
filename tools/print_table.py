@@ -20,7 +20,7 @@ def beat(length: int = 1) -> None:
     yield
     sleep(length * BEAT_TIME)
 
-def print_machine_table(console, machine_list):
+def print_machine_table(console, machine_list, table_title):
     """
     print_machine: Draw a table with a simple animation for all machine list
     :param console: Console() from rich to print table
@@ -30,7 +30,7 @@ def print_machine_table(console, machine_list):
     table = Table(show_footer = False, box = box.ASCII)
     table_align = Align.left(table)
     column_titles = ['ID', 'Name', 'Os', 'IP', 'Points', 'Difficulty', 'User Owned?', 'System Owned?']
-    column_styles = ['cyan', 'green', 'yellow', 'magenta', 'deep_sky_blue1', 'salmon1', 'white', 'white']
+    column_styles = ['bright_cyan', 'bright_green', 'bright_yellow', 'bright_magenta', 'deep_sky_blue1', 'salmon1', 'white', 'white']
     column_align = ['center', 'left', 'left', 'left', 'center', 'left', 'center', 'center']
 
     with Live(table_align, console = console, screen = False, refresh_per_second = 60):
@@ -41,7 +41,7 @@ def print_machine_table(console, machine_list):
                 table.add_column(column_titles[value], style = column_styles[value], justify = column_align[value], no_wrap = True)
 
         with beat(10):
-            table.title = "HTB Ranking Machines"
+            table.title = table_title
 
         for index in range(len(machine_list['info'])):
             user_owned = ":x:" 

@@ -34,7 +34,7 @@ def login(config: ConfigParser, console):
         if not valid_email: 
             console.print("Invalid email, try again!", style = "error")
 
-    password = console.input("[bold green]Please, enter your password: ", password = True) 
+    password = console.input("[bright_green]Please, enter your password: ", password = True) 
 
     data = {
         "email": email,
@@ -77,7 +77,7 @@ def login(config: ConfigParser, console):
 def verify_otp(config: ConfigParser, access_token: str, console) -> bool:
     """
     verify_otp: Verify 2fa code in case was enabled
-    :param config: Confi parser to get url, endpoint and headers.
+    :param config: Config parser to get url, endpoint and headers.
     :param access_token: Bearer token from login successful
     :return: True if successful, False otherwise
     """
@@ -86,7 +86,7 @@ def verify_otp(config: ConfigParser, access_token: str, console) -> bool:
     headers = dict(config['htb_headers'])
     headers["Authorization"] = "Bearer " + access_token
 
-    otp = console.input("[bold green]Please, enter your otp code: ")
+    otp = console.input("[bright_green]Please, enter your otp code: ")
 
     data = {"one_time_password" : otp}
 

@@ -122,3 +122,77 @@ def search_by_maker(config, console):
         return
 
     print_table(console, search_result, f"Machines made by [bold bright_green]{user_choice}")
+
+def show_spawned_machine(config, console):
+    """
+    show_spawned_machine: Get spawned machine if exists
+    """
+    url = config['htb']['machine_url']
+    endpoint = config['htb_machine_api']['spawned']
+    headers = dict(config['htb_headers'])
+
+    machine_list = api_get(url, endpoint, headers)
+
+    if machine_list['info'] is None:
+        console.print("Sorry, you don't have any machines currently started", style = 'info')
+        return False
+    
+    console.print(f"[bold bright_red]{machine_list['info']['name']}[/] is currently active, do you want to turn it off? y/n: ", end = "", style = 'info')
+    user_choice = console.input()
+
+    if user_choice.lower() == 'y':
+        stop_spawned_machine(config, console, machine_list['info']['id'])
+    
+    return True
+    
+def stop_spawned_machine(config, console, machine_id):
+    """
+    stop_spawned_machine: Shutdown assigned machine by id
+    machine_id: Machine ID
+    """
+
+    url = config['htb']['vm_url']
+    endpoint = config['htb_machine_api']['terminate']
+    headers = dict(config['htb_headers'])
+
+    data = {'machine_id' : int(machine_id)}
+
+    with console.status("[bold bright_cyan]Turning off the machine...", spinner = "aesthetic") as status:
+        stop_machine = api_post(url, endpoint, headers, data)
+
+    if stop_machine.status_code != 200:
+        console.print(f"The machine could not be turned off.", style = "warning")
+        console.print(f"Status code: {stop_machine.status_code}.", style = "warning")
+        console.print(f"Status msg: {stop_machine.text}.", style = "warning")
+        return
+
+    console.print("Machine shut down successfully!", style = 'info')
+
+def spawn_machine(config, console):
+    """
+    spawn_machine: Start and assing a machine to user
+    :param machine_id: Required to search and start machine
+    """
+    url = config['htb']['vm_url']
+    endpoint = config['htb_machine_api']['spawn']
+    headers = dict(config['htb_headers'])
+
+    user_choice = console.input("[bright_cyan]Do you want to start a machine? y/n: ")
+
+    if user_choice.lower() == 'n':
+        return
+
+    machine_id = console.input('[bright_cyan]Please enter the machine id to start: ')
+
+    data = {'machine_id' : int(machine_id)}
+
+    with console.status("[bold bright_cyan]Turning on the machine...", spinner = "aesthetic") as status:
+        start_machine = api_post(url, endpoint, headers, data)
+
+    if start_machine.status_code != 200:
+        console.print(f"The machine could not be turned on.", style = "warning")
+        console.print(f"Status code: {start_machine.status_code}.", style = "warning")
+        console.print(f"Status msg: {start_machine.text}.", style = "warning")
+        return
+
+    console.print("Machine started successfully!", style = 'info')

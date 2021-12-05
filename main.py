@@ -4,7 +4,6 @@ from tools.auth import login
 from static_main_menu import default_menu
 from rich.theme import Theme
 from rich.console import Console
-from time import sleep
 
 # log theme for warnings, errors and info
 log_theme = Theme({

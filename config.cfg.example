@@ -18,6 +18,7 @@ retired = /list/retired
 spawned = /active
 spawn = /spawn
 terminate = /terminate
+owned = /own
 
 [htb_headers]
 authority = www.hackthebox.com

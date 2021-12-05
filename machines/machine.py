@@ -29,7 +29,7 @@ def list_vip(config, console):
     endpoint = config['htb_machine_api']['retired']
     headers = dict(config['htb_headers'])
 
-    with console.status("[bold bright_cyan]Requesting active machines", spinner = "aesthetic") as status:
+    with console.status("[bold bright_cyan]Requesting vip machines", spinner = "aesthetic") as status:
         machine_list = api_get(url, endpoint, headers)
 
     print_table(console, machine_list, "HTB VIP Machines")
@@ -89,7 +89,6 @@ def search_by_filter(config, console, filter):
 
     print_table(console, search_result, "Search results")
 
-
 def search_by_maker(config, console):
     """
     search_by_maker: Search machines by maker or maker 2 in db file
@@ -136,12 +135,20 @@ def show_spawned_machine(config, console):
     if machine_list['info'] is None:
         console.print("Sorry, you don't have any machines currently started", style = 'info')
         return False
-    
+
     console.print(f"[bold bright_red]{machine_list['info']['name']}[/] is currently active, do you want to turn it off? y/n: ", end = "", style = 'info')
     user_choice = console.input()
 
     if user_choice.lower() == 'y':
         stop_spawned_machine(config, console, machine_list['info']['id'])
+        return
+
+    console.print('Do you want to send a flag? y/n: ', end = "", style = 'info')
+    user_choice = console.input()
+
+    if user_choice.lower() == 'y':
+        send_flag(config, console, machine_list['info']['id'])
+        return
     
     return True
     
@@ -196,3 +203,39 @@ def spawn_machine(config, console):
         return
 
     console.print("Machine started successfully!", style = 'info')
+
+def send_flag(config, console, machine_id):
+    """
+    send_flag: Send User/Root flag
+    """
+    url = config['htb']['machine_url']
+    endpoint = config['htb_machine_api']['owned']
+    headers = dict(config['htb_headers'])
+
+    # User rating
+    user_rating = int(console.input('[bright_cyan]Please rate machine difficult between 10 (easy) and 100 (brain fuck) using multiple of 10: '))
+        
+    if user_rating < 10 or user_rating > 100 or user_rating % 10 != 0:
+        console.print(f"{user_rating} is invalid, please use an integer and multiple of 10 value. (10, 20, ... 90, 100)", style = "error")
+        return
+    
+    flag = console.input('[bright_green]Please enter the flag: ')
+
+    #if has a valid rating number
+    data = {
+        'id' : int(machine_id),
+        'flag': flag.strip(),
+        'difficulty': user_rating
+    }
+
+    with console.status('[bold bright_cyan]Sending flag...', spinner = "aesthetic") as status:
+        post_flag = api_post(url, endpoint, headers, data)
+    
+    if post_flag == 200:
+        console.print("Flag sended successfully!", style = 'info')
+        return
+    
+    console.print("Error sending the flag", style = 'error')
+    console.print(f"Status code: {post_flag.status_code}.", style = 'warning')
+    console.print(f'Status msg: {post_flag.text}.', style = "info")
+    return

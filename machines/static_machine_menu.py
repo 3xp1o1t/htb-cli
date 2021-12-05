@@ -10,12 +10,8 @@ def machine_menu(config, console):
         '1. List ranking machines',
         '2. List vip machines (slow)',
         '3. Update machine list (slow, store to file)',
-        '4. Search machine by filter (offline)',
-        '5. Show spawned machine',
-        '6. Stop spawned machine',
-        '7. Spawn a new machine',
-        '8. Send user flag',
-        '9. Send root flag',
+        '4. Search machine by filter (works offline)',
+        '5. Show spawned machine (Stop/Send Flag)',
         '0. Back to Main Menu'
     ]
     console.clear()
@@ -38,18 +34,6 @@ def machine_menu(config, console):
 
         elif user_input == '5':
             show_spawned_machine(config, console)
-
-        elif user_input == '6':
-            show_spawned_machine(config, console)
-
-        elif user_input == '7':
-            spawn_machine(config, console)
-
-        elif user_input == '8':
-            console.print('Option choice = 8')
-
-        elif user_input == '8':
-            console.print('Option choice = 8')
 
         elif user_input == '0':
             console.clear()

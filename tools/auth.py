@@ -1,6 +1,6 @@
 from re import fullmatch 
 from tools.api import api_post
-from tools.utils import update_config
+from tools.utils import update_config, read, log
 from configparser import ConfigParser
 
 """
@@ -28,13 +28,13 @@ def login(config: ConfigParser, console):
     valid_email = None 
 
     while valid_email == None:
-        email = console.input("[bright_green]Please, enter your email: ")
+        email = read("Please, enter your email", '3xp1o1t@htb.cli')
         valid_email = check(email)
 
         if not valid_email: 
-            console.print("Invalid email, try again!", style = "error")
+            log('Invalid email, try again!', message_style = 'error')
 
-    password = console.input("[bright_green]Please, enter your password: ", password = True) 
+    password = console.input("[bold bright_green]Please, enter your password: ", password = True) 
 
     data = {
         "email": email,
@@ -52,7 +52,6 @@ def login(config: ConfigParser, console):
     if response.status_code != 200:
         return False
 
-    console.print("Login successfully!", style = "info")
     # Cast to json to access values
     response = response.json()
     access_token = response['message']['access_token']
@@ -64,13 +63,11 @@ def login(config: ConfigParser, console):
     if not verify_otp(config, access_token, console):
         return False
 
-    console.print("Access token verified!", style = "info")
-
     # Update Bearer token from config file
     access_token = "Bearer " + access_token
     update_bearer = update_config('config.cfg', 'htb_headers', 'authorization', access_token)    
     if not update_bearer:
-        console.print("Everything is fine, we just couldn't update your access token in config file!", style = "warning")
+        log('We can not update your access token in config file!', message_style = 'warning', wait_for_input = True)
     
     return True
     
@@ -86,7 +83,7 @@ def verify_otp(config: ConfigParser, access_token: str, console) -> bool:
     headers = dict(config['htb_headers'])
     headers["Authorization"] = "Bearer " + access_token
 
-    otp = console.input("[bright_green]Please, enter your otp code: ")
+    otp = read("Please, enter your otp code", '133742')
 
     data = {"one_time_password" : otp}
 

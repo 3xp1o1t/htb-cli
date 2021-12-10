@@ -1,4 +1,5 @@
 from tools.generate_menu import print_menu
+from tools.utils import log, read
 from machines.machine import *
 
 """
@@ -8,23 +9,21 @@ Related methods for printing and performing operations with the machines.
 def machine_menu(config, console):
     default_options = [
         '1. List ranking machines',
-        '2. List vip machines (slow)',
-        '3. Update machine list (slow, store to file)',
-        '4. Search machine by filter (works offline)',
-        '5. Show spawned machine (Stop/Send Flag)',
+        '2. List vip machines (Slow)',
+        '3. Update machine list (Slow, store data to file)',
+        '4. Search machine by filter (Works offline)',
+        '5. Machine options (Show/Stop/Send Flag)',
         '0. Back to Main Menu'
     ]
     console.clear()
     while True:
         print_menu(console, default_options, 'Machine Menu')
-        user_input = console.input("[bold cyan]Machine - [bold green] Option (default 1) > ")
-        if user_input == '1' or user_input == '':
+        user_input = read('Machine - Option', '1')
+        if user_input == '1':
             list_ranking(config, console)
-            spawn_machine(config, console)
 
         elif user_input == '2':
             list_vip(config, console)
-            spawn_machine(config, console)
 
         elif user_input == '3':
             list_all(config, console)
@@ -40,7 +39,7 @@ def machine_menu(config, console):
             return
 
         else:
-            console.print("Invalid option, try again!", style="error")
+            log('Invalid option, try again!', 'error')
 
 
 def search_machine_menu(config, console):
@@ -55,30 +54,25 @@ def search_machine_menu(config, console):
     console.clear()
     while True:
         print_menu(console, default_options, 'Machine Search Menu')
-        user_input = console.input("[bold cyan]Machine Search - [bold green] Option (default 1) > ")
-        if user_input == '1' or user_input == '':
+        user_input = read('Machine Search by Filter', '1')
+        if user_input == '1':
             search_by_filter(config, console, 'name')
-            spawn_machine(config, console)
 
         elif user_input == '2':
             search_by_filter(config, console, 'os')
-            spawn_machine(config, console)
 
         elif user_input == '3':
             search_by_filter(config, console, 'ip')
-            spawn_machine(config, console)
 
         elif user_input == '4':
             search_by_filter(config, console, 'difficultyText')
-            spawn_machine(config, console)
 
         elif user_input == '5':
             search_by_maker(config, console)
-            spawn_machine(config, console)
 
         elif user_input == '0':
             console.clear()
             return
 
         else:
-            console.print("Invalid option, try again!", style="error")
+            log('Invalid option, try again!', 'error')

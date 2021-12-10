@@ -1,5 +1,6 @@
 from tools.generate_menu import print_menu
 from machines.static_machine_menu import machine_menu
+from tools.utils import log, read
 
 def default_menu(config, console):
     default_options = [
@@ -9,8 +10,8 @@ def default_menu(config, console):
     console.clear()
     while True:
         print_menu(console, default_options, 'Main Menu')
-        user_input = console.input("[bold green]Please, enter your option (default 1) > ")
-        if user_input == '1' or user_input == '':
+        user_input = read("Please, type an option", '1')
+        if user_input == '1':
             machine_menu(config, console)
 
         elif user_input == '0':
@@ -18,4 +19,5 @@ def default_menu(config, console):
             return
 
         else:
-            console.print("Invalid option, try again!", style="error")
+            console.clear()
+            log('Invalid option, try again!', 'error')

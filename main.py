@@ -1,19 +1,20 @@
 from tools.intro import intro
-from tools.utils import read_config
+from tools.utils import read_config, read, log
 from tools.auth import login
 from static_main_menu import default_menu
-from rich.theme import Theme
 from rich.console import Console
+import signal
 
-# log theme for warnings, errors and info
-log_theme = Theme({
-    "info": "bright_cyan",
-    "warning": "bright_yellow",
-    "error": "bold bright_red",
-    "prompt": "bright_green",
-})
+# A ctrl+c handler from code-maven.com
+def handler(signum, frame):
+    is_exiting = read('Ctrl + C was pressed. Do you really want to exit?', '', True)
+    if is_exiting:
+        exit(1)
+
+signal.signal(signal.SIGINT, handler)
+
 # Some bad programming practices ;(
-console = Console(theme=log_theme)
+console = Console()
 # load config
 config = read_config('config.cfg')
 
@@ -26,9 +27,7 @@ def check_login():
         is_logged = login(config, console)
         if is_logged:
             break;
-        choice = console.input("[bold bright_red]Wrong email, password or OTP,please enter to try again or x to quit: ")
-        if choice.lower() == 'x':
-            break;
+        log("Wrong email, password or OTP, please enter to try again!", 'error', True)
     
     console.clear()
 

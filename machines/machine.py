@@ -1,8 +1,6 @@
-from rich import style
-from tools.utils import save_machine_list, load_machine_list
+from tools.utils import save_machine_list, load_machine_list, log, read
 from tools.api import api_get, api_post
 from machines.print_machine_table import print_table
-from rich.style import Style
 
 """
 Related methods for playing the machines 
@@ -20,6 +18,7 @@ def list_ranking(config, console):
         machine_list = api_get(url, endpoint, headers)
 
     print_table(console, machine_list, "HTB Ranking Machines")
+    spawn_machine(config, console)
         
 def list_vip(config, console):
     """
@@ -33,6 +32,7 @@ def list_vip(config, console):
         machine_list = api_get(url, endpoint, headers)
 
     print_table(console, machine_list, "HTB VIP Machines")
+    spawn_machine(config, console)
 
 def list_all(config, console):
     """
@@ -43,7 +43,7 @@ def list_all(config, console):
     endpoint_active = config['htb_machine_api']['active']
     headers = dict(config['htb_headers'])
 
-    with console.status("[bold bright_cyan]Updating machine list db...", spinner = "aesthetic") as status:
+    with console.status("[bold bright_cyan]Updating machine list db", spinner = "aesthetic") as status:
         # First all available vip/no ranking free machines
         all_machine_list = api_get(url, endpoint, headers)
         # All ranking machines, for some reason /list/all don't return ranking machines.
@@ -56,10 +56,10 @@ def list_all(config, console):
         # Store list on file to use for search.
         save_machine_list(config['default']['machine_list'], all_machine_list)
 
-    console.print(f"Total machines: {len(all_machine_list['info'])}", style = 'info')
+    log(f"Total machines: {len(all_machine_list['info'])}", message_style = 'info')
 
-    user_choice = console.input("[bold bright_green]Machine DB successfully updated!, Do you want to print the output? y/n: ")
-    if user_choice.lower() != 'y':
+    user_choice = read("Machine DB successfully updated!, Do you want to print the output?", '', is_confirm = True)
+    if not user_choice:
         console.clear()
         return
     
@@ -72,7 +72,11 @@ def search_by_filter(config, console, filter):
     # Dict with machine list from file machine.txt
     machine_list = load_machine_list(config['default']['machine_list'])
 
-    user_choice = console.input(f"[bold bright_cyan]Please insert the {filter}: ")
+    user_choice = read(f"Please insert the {filter.capitalize()}", 'htb')
+
+    if len(user_choice) < 1:
+        log(f"Please, next time put something to search", message_style = 'warning')
+        return
 
     # Search result = Dict like machine_list to reuse print_table
     search_result = {"info": []}
@@ -84,10 +88,11 @@ def search_by_filter(config, console, filter):
             search_result['info'].append(machine_list['info'][index].copy())
 
     if len(search_result['info']) == 0:
-        console.print(f"Sorry, nothing was found with * {user_choice} * value!", style = 'error')
+        log(f"Sorry, nothing was found with * [bright_yellow]{user_choice}[/bright_yellow] * value!", message_style= 'error')
         return
 
     print_table(console, search_result, "Search results")
+    spawn_machine(config, console)
 
 def search_by_maker(config, console):
     """
@@ -97,7 +102,10 @@ def search_by_maker(config, console):
     # Dict with machine list from file machine.txt
     machine_list = load_machine_list(config['default']['machine_list'])
 
-    user_choice = console.input(f"[bold bright_cyan]Please insert the creator username: ")
+    user_choice = read(f"Please insert the creator username", '0xdf')
+    if len(user_choice) < 1:
+        log(f"Please, next time put something to search", message_style = 'warning')
+        return
 
     # Search result = Dict like machine_list to reuse print_table
     search_result = {"info": []}
@@ -117,10 +125,11 @@ def search_by_maker(config, console):
                 search_result['info'].append(machine_list['info'][index].copy())
 
     if len(search_result['info']) == 0:
-        console.print(f"Sorry, nothing was found with * {user_choice} * value!", style = 'error')
+        log(f"Sorry, nothing was found with * [bright_yellow]{user_choice}[/bright_yellow] * value!", message_style= 'error')
         return
 
     print_table(console, search_result, f"Machines made by [bold bright_green]{user_choice}")
+    spawn_machine(config, console)
 
 def show_spawned_machine(config, console):
     """
@@ -133,23 +142,19 @@ def show_spawned_machine(config, console):
     machine_list = api_get(url, endpoint, headers)
 
     if machine_list['info'] is None:
-        console.print("Sorry, you don't have any machines currently started", style = 'info')
         return False
 
-    console.print(f"[bold bright_red]{machine_list['info']['name']}[/] is currently active, do you want to turn it off? y/n: ", end = "", style = 'info')
-    user_choice = console.input()
+    user_choice = read(f"[bright_yellow]* {machine_list['info']['name']} *[/bright_yellow] is currently active, do you want to send the flag?", '', True)
 
-    if user_choice.lower() == 'y':
-        stop_spawned_machine(config, console, machine_list['info']['id'])
-        return
-
-    console.print('Do you want to send a flag? y/n: ', end = "", style = 'info')
-    user_choice = console.input()
-
-    if user_choice.lower() == 'y':
+    if user_choice:
         send_flag(config, console, machine_list['info']['id'])
-        return
-    
+
+    user_choice = read(f"Would you like to turning off the [bright_yellow] * {machine_list['info']['name']} *[/bright_yellow] machine?", '', True)
+
+    # Return true, if user send or not send a flag.
+    if user_choice:
+        stop_spawned_machine(config, console, machine_list['info']['id'])
+
     return True
     
 def stop_spawned_machine(config, console, machine_id):
@@ -164,16 +169,18 @@ def stop_spawned_machine(config, console, machine_id):
 
     data = {'machine_id' : int(machine_id)}
 
-    with console.status("[bold bright_cyan]Turning off the machine...", spinner = "aesthetic") as status:
+    with console.status("[bold bright_cyan]Turning off the machine", spinner = "aesthetic") as status:
         stop_machine = api_post(url, endpoint, headers, data)
 
     if stop_machine.status_code != 200:
-        console.print(f"The machine could not be turned off.", style = "warning")
-        console.print(f"Status code: {stop_machine.status_code}.", style = "warning")
-        console.print(f"Status msg: {stop_machine.text}.", style = "warning")
+        log("The machine could not be turned off. \n" + \
+            f"Status code: {stop_machine.status_code}. \n" + \
+                f"Status msg: {stop_machine.text}.", 
+        message_style = 'warning')
+        
         return
 
-    console.print("Machine shut down successfully!", style = 'info')
+    log("Machine shut down successfully!", 'info')
 
 def spawn_machine(config, console):
     """
@@ -184,25 +191,35 @@ def spawn_machine(config, console):
     endpoint = config['htb_machine_api']['spawn']
     headers = dict(config['htb_headers'])
 
-    user_choice = console.input("[bright_cyan]Do you want to start a machine? y/n: ")
-
-    if user_choice.lower() == 'n':
+        #log("Sorry, you don't have any machine currently started!", message_style = 'warning')
+    is_a_machine_running = show_spawned_machine(config, console)
+    if is_a_machine_running:
         return
 
-    machine_id = console.input('[bright_cyan]Please enter the machine id to start: ')
+    user_choice = read('Do you want to start a machine?', '', True)
 
-    data = {'machine_id' : int(machine_id)}
+    if not user_choice:
+        return
 
-    with console.status("[bold bright_cyan]Turning on the machine...", spinner = "aesthetic") as status:
+    machine_id = read('Please enter the machine id to start', 1)
+
+    try:
+        data = {'machine_id' : int(machine_id)}
+    except ValueError:
+        log('Invalid id, please verify the ID machine and use only numbers!', 'error')
+        return
+
+    with console.status("[bold bright_cyan]Turning on the machine", spinner = "aesthetic") as status:
         start_machine = api_post(url, endpoint, headers, data)
 
     if start_machine.status_code != 200:
-        console.print(f"The machine could not be turned on.", style = "warning")
-        console.print(f"Status code: {start_machine.status_code}.", style = "warning")
-        console.print(f"Status msg: {start_machine.text}.", style = "warning")
+        log(f"The machine could not be turned on.\n" + \
+            f"Status code: {start_machine.status_code}.\n" + \
+                f"Status msg: {start_machine.text}.",
+                message_style = 'warning')
         return
 
-    console.print("Machine started successfully!", style = 'info')
+    log("Machine started successfully!", message_style = 'info')
 
 def send_flag(config, console, machine_id):
     """
@@ -212,14 +229,23 @@ def send_flag(config, console, machine_id):
     endpoint = config['htb_machine_api']['owned']
     headers = dict(config['htb_headers'])
 
-    # User rating
-    user_rating = int(console.input('[bright_cyan]Please rate machine difficult between 10 (easy) and 100 (brain fuck) using multiple of 10: '))
+    #my worst solution agains a re-input data problem :v 
+    is_value_invalid = True
+    while is_value_invalid:
+        # User rating
+        user_rating = read('Please rate the machine difficult between 10 and 100 using multiple of 10', '10')
+        try:
+            user_rating = int(user_rating)
+        except ValueError:
+            log('Invalid rating value, please verify your value and use only numbers (10, 20, ... 90, 100)!', 'error')
+        else:
+            if user_rating < 10 or user_rating > 100 or user_rating % 10 != 0:
+                log(f"{user_rating} is invalid, please use an integer and multiple of 10 value. (10, 20, ... 90, 100)", 'error')
+            else:
+                is_value_invalid = False 
         
-    if user_rating < 10 or user_rating > 100 or user_rating % 10 != 0:
-        console.print(f"{user_rating} is invalid, please use an integer and multiple of 10 value. (10, 20, ... 90, 100)", style = "error")
-        return
-    
-    flag = console.input('[bright_green]Please enter the flag: ')
+    # TODO -> code a way to verify a flag or something else.
+    flag = read('Please enter the flag', '3x4mp13_f14g_5crypt_k1D_v')
 
     #if has a valid rating number
     data = {
@@ -228,14 +254,19 @@ def send_flag(config, console, machine_id):
         'difficulty': user_rating
     }
 
-    with console.status('[bold bright_cyan]Sending flag...', spinner = "aesthetic") as status:
+    with console.status('[bold bright_cyan]Sending flag', spinner = "aesthetic") as status:
         post_flag = api_post(url, endpoint, headers, data)
     
-    if post_flag == 200:
-        console.print("Flag sended successfully!", style = 'info')
+    if post_flag.status_code == 200:
+        log("Flag sended successfully!", message_style = 'info')
         return
     
-    console.print("Error sending the flag", style = 'error')
-    console.print(f"Status code: {post_flag.status_code}.", style = 'warning')
-    console.print(f'Status msg: {post_flag.text}.', style = "info")
+    if post_flag.status_code == 400:
+        log("Incorrect Flag!", message_style = 'warning')
+        return   
+
+    log('An unknown error has occurred!\n' + \
+        f'Status code: {post_flag.status_code}.\n' + \
+            f'Status msg: {post_flag.text}.',
+        message_style = 'error')
     return

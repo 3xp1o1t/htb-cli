@@ -1,5 +1,8 @@
 from configparser import ConfigParser
 from json import dump, load
+from rich import print, box
+from rich.panel import Panel
+from rich.prompt import Prompt, Confirm
 
 """
 Collection of methods that function as helpers
@@ -53,3 +56,43 @@ def load_machine_list(filename: str):
     """
     with open(filename, 'r') as file_handle:
         return load(file_handle)
+    
+def log(message, message_style, wait_for_input: bool = False):
+    """
+    log: Print formated log
+    :param message: Message to print out
+    :param message_style: Style message (error, info, warning)
+    :param wait_for_input: In case user need to read the log obligatorily
+    """
+    style = {
+        'info':'bold bright_cyan',
+        'warning':'bold bright_yellow',
+        'error':'bold bright_red'
+    }
+    print("\n", Panel.fit(message, box.DOUBLE_EDGE, title=message_style.upper(), border_style = style[message_style]), "\n")
+
+    if wait_for_input:
+        read('Press enter to continue', '[enter]')
+
+
+def read(message, default_value, is_confirm: bool = False):
+    """
+    read: Read user input and return what reads or False
+    :param message: Messate to prompt
+    :param default_value: Default value in case user don't specify
+    :param is_confirm: Confirm only have 2 choices, y/n
+    """
+
+    message = '[bold bright_green]' + message
+
+    if is_confirm:
+        is_yes = Confirm.ask(message)
+        return is_yes
+
+    user_choice = Prompt.ask(message, default = default_value)
+    
+    return user_choice
+    
+    
+
+

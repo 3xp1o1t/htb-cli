@@ -27,18 +27,21 @@ def print_table(console, machine_list, table_title):
     :param machine_list: List of machine from a response
     """
     console.clear()
-    table = Table(show_footer = False, box = box.ASCII)
+    table = Table(show_footer = True, box = box.ASCII)
     table_align = Align.left(table)
     column_titles = ['ID', 'Name', 'Os', 'IP', 'Points', 'Difficulty', 'User Owned?', 'System Owned?']
     column_styles = ['bright_cyan', 'bright_green', 'bright_yellow', 'bright_magenta', 'deep_sky_blue1', 'salmon1', 'white', 'white']
     column_align = ['center', 'left', 'left', 'left', 'center', 'left', 'center', 'center']
+    total_user_owned = 0
+    total_root_owned = 0
 
-    with Live(table_align, console = console, screen = False, refresh_per_second = 60):
+    # vertical_overflow = autoscroll when renderin, better if use show_footer = True
+    with Live(table_align, console = console, screen = False, refresh_per_second = 12, vertical_overflow = 'visible'):
 
         #list_length: Column_titles = Column_styles = Column alignment - Probably a bad programming practice :(
         for value in range(len(column_titles)):
             with beat(10):
-                table.add_column(column_titles[value], style = column_styles[value], justify = column_align[value], no_wrap = True)
+                table.add_column(column_titles[value], footer=column_titles[value], style = column_styles[value], justify = column_align[value], no_wrap = True)
 
         with beat(10):
             table.title = table_title
@@ -48,9 +51,11 @@ def print_table(console, machine_list, table_title):
             root_owned = ":x:"
             if machine_list['info'][index]['authUserInUserOwns'] is not None:
                 user_owned = ":white_check_mark:"
+                total_user_owned += 1
 
             if machine_list['info'][index]['authUserInRootOwns'] is not None:
                 root_owned = ":white_check_mark:"
+                total_root_owned += 1
 
             with beat(10):
                 table.add_row(
@@ -63,7 +68,9 @@ def print_table(console, machine_list, table_title):
                     user_owned,
                     root_owned
                 )
-
+        
         with beat(10):
             table.border_style = "bright_cyan"
 
+    console.print(f'[+] Total found: {index + 1}\t\t[+] Total User Owned: {total_user_owned}\t\t[+] Total Root Owned: {total_root_owned}', style = 'bold')
+        

@@ -35,8 +35,8 @@ def main():
     """
     main: Just a simple main function
     """
-    #intro(console)
-    #check_login()
+    intro(console)
+    check_login()
     default_menu(config, console)
 
 # Initialize all stuff    

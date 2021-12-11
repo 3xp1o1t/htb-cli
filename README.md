@@ -91,7 +91,15 @@ Here's a cli project to interact with HTB API v4.
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
+## Video Demo (Prototype/test on Linux(debian)).
 
+<div align="center">
+  <a href="https://youtu.be/yD68tMfUhYg">
+    <img src="https://img.youtube.com/vi/yD68tMfUhYg/0.jpg" alt="DEMO" >
+  </a>
+</div>
+
+<p align="right">(<a href="#top">back to top</a>)</p>
 
 ### Built With
 
@@ -112,7 +120,7 @@ To get a local copy up and running follow these simple example steps.
 
 Install each tool following next instructions.
 
-* Rich 10.12.0
+* Rich 10.12.0+
   ```sh
   pip3 install rich==10.12.0
   ```
